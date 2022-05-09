@@ -19,8 +19,18 @@ class Repo:
     async def list_users(self) -> List[int]:
         """List all bot users"""
         return [
-            # row[0]
-            # async for row in self.conn.execute(
-            #     "select userid from tg_users",
-            # )
+            row[0]
+            async for row in self.conn.execute(
+                "select userid from tg_users",
+            )
+        ]
+
+    async def get_admins(self) -> List[int]:
+        # admins = await self.conn.fetch(
+        #     'SELECT user_id FROM main_passport WHERE admin = True'
+        # )
+        # data = ([admin['user_id'] for admin in admins])
+        return [
+            row[0]
+            async for row in self.conn.execute('SELECT user_id FROM users WHERE admin = True', )
         ]

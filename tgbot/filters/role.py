@@ -32,7 +32,9 @@ class AdminFilter(BoundFilter):
         self.is_admin = is_admin
 
     async def check(self, obj: TelegramObject):
-        if self.is_admin is None:
-            return True
         data = ctx_data.get()
-        return (data.get("role") is UserRole.ADMIN) == self.is_admin
+        repo = data.get("repo")
+        if self.is_admin is None or self.is_admin is False:
+            return True
+        else:
+            return obj.from_user.id in await repo.get_admins()
