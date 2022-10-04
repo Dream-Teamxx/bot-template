@@ -4,7 +4,7 @@ from abc import ABC
 from aiogram.filters import BaseFilter
 from aiogram.types.base import TelegramObject
 
-from tgbot.services.repository import Repo
+from app.tgbot.services.repository import Repo
 
 
 class AdminFilter(BaseFilter, ABC):

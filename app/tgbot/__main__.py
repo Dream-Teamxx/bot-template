@@ -7,16 +7,16 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler
 from aiohttp import web
+# from app.tgbot.db.models import create_tables
+from app.tgbot.dialogs.misc.inline_search import inline_router
+from app.tgbot.dialogs.misc.setup import setup_dialogs
+from app.tgbot.dialogs.user.user_main import register_handlers_user
 from magic_filter import F
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from tgbot.configreader import config
-# from tgbot.db.models import create_tables
-from tgbot.dialogs.misc.inline_search import inline_router
-from tgbot.dialogs.misc.setup import setup_dialogs
-from tgbot.dialogs.user.user_main import register_handlers_user
 
-from tgbot.middlewares.db import DbSessionMiddleware
+from app import config
+from app.tgbot.middlewares.db import DbSessionMiddleware
 
 
 async def main():
@@ -30,7 +30,7 @@ async def main():
     logging.info('Starting bot')
 
     # Creating DB engine for PostgreSQL
-    engine = create_async_engine(config.postgres_dsn, future=True)
+    engine = create_async_engine(config.db.postgres_dsn, future=True)
 
     # Creating DB connections pool
     db_pool = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
