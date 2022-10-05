@@ -1,45 +1,43 @@
-import configparser
-from dataclasses import dataclass
+import json
+
+from pydantic import BaseSettings, validator
 
 
-@dataclass
-class DbConfig:
+class DB(BaseSettings):
+    postgres_dsn: str
+
+
+class Redis(BaseSettings):
     host: str
-    password: str
-    user: str
-    database: str
+    db: int
 
 
-@dataclass
-class TgBot:
+class TgBot(BaseSettings):
     token: str
-    admin_id: int
+    admin_ids: list[int]
     use_redis: bool
+    use_webhook: bool
+    webhook_host: str
+    webhook_path: str
+    app_host: str
+    app_port: int
+
+    @validator("admin_ids", pre=True, always=True)
+    def admin_ids_list(cls, v) -> list[int]:
+        return json.loads(v)
 
 
-@dataclass
-class Config:
+class Settings(BaseSettings):
     tg_bot: TgBot
-    db: DbConfig
+    db: DB
+    redis: Redis
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        env_nested_delimiter = "__"
 
 
-def cast_bool(value: str) -> bool:
-    if not value:
-        return False
-    return value.lower() in ("true", "t", "1", "yes")
-
-
-def load_config(path: str):
-    config = configparser.ConfigParser()
-    config.read(path)
-
-    tg_bot = config["tg_bot"]
-
-    return Config(
-        tg_bot=TgBot(
-            token=tg_bot["token"],
-            admin_id=int(tg_bot["admin_id"]),
-            use_redis=cast_bool(tg_bot.get("use_redis")),
-        ),
-        db=DbConfig(**config["db"]),
-    )
+def load_config(env_file=".env") -> Settings:
+    settings = Settings(_env_file=env_file)
+    return settings
