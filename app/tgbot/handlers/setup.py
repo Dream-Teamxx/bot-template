@@ -1,8 +1,8 @@
 from aiogram import Dispatcher, Router
 from aiogram_dialog import DialogRegistry
 
-from tgbot.filters.role import AdminFilter
-from tgbot.handlers.user.user import register_start
+from app.tgbot.filters.role import AdminFilter
+from app.tgbot.handlers.user.user import register_start
 
 
 def register_handlers(dp: Dispatcher, dialog_registry: DialogRegistry):

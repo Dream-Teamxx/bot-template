@@ -1,22 +1,23 @@
-from aiogram.dispatcher.middlewares import LifetimeControllerMiddleware
+from typing import Callable, Awaitable, Dict, Any
 
-from tgbot.services.repository import Repo
+from aiogram import BaseMiddleware
+from aiogram.types import TelegramObject
+
+from app.tgbot.services.repository import Repo
 
 
-class DbMiddleware(LifetimeControllerMiddleware):
-    skip_patterns = ["error", "update"]
-
-    def __init__(self, pool):
+class DbSessionMiddleware(BaseMiddleware):
+    def __init__(self, session_pool):
         super().__init__()
-        self.pool = pool
+        self.session_pool = session_pool
 
-    async def pre_process(self, obj, data, *args):
-        db = await self.pool.acquire()
-        data["db"] = db
-        data["repo"] = Repo(db)
-
-    async def post_process(self, obj, data, *args):
-        del data["repo"]
-        db = data.get("db")
-        if db:
-            await db.close()
+    async def __call__(
+            self,
+            handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+            event: TelegramObject,
+            data: Dict[str, Any],
+    ) -> Any:
+        async with self.session_pool() as session:
+            data["session"] = session
+            data["repo"] = Repo(session)
+            return await handler(event, data)
