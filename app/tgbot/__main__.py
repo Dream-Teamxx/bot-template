@@ -42,11 +42,11 @@ async def main():
         storage = MemoryStorage()
 
     # Creating DB connections pool
-    engine = create_async_engine(config.db.postgres_dsn, future=True)
+    engine = create_async_engine(config.postgres_dsn, future=True)
     db_pool = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     logging.debug('DB successfully initialized')
 
-    bot = Bot(token=config.tg_bot.token, parse_mode="HTML")
+    bot = Bot(token=config.bot_token, parse_mode="HTML")
     dp = Dispatcher(storage=storage, events_isolation=SimpleEventIsolation())
     dialog_registry = DialogRegistry(dp)
 
@@ -62,7 +62,7 @@ async def main():
     register_handlers(dp=dp, dialog_registry=dialog_registry)
     try:
 
-        if not config.tg_bot.use_webhook:
+        if not config.webhook_domain:
 
             await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
         else:
@@ -74,7 +74,7 @@ async def main():
 
             # Setting webhook
             await bot.set_webhook(
-                url=config.tg_bot.webhook_host + config.tg_bot.webhook_path,
+                url=config.webhook_domain + config.webhook_path,
                 drop_pending_updates=True,
                 allowed_updates=dp.resolve_used_update_types()
             )
