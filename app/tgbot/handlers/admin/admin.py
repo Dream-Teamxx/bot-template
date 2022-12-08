@@ -1,16 +1,28 @@
-from aiogram import Dispatcher
+import logging
+
+from aiogram import Router, F
+from aiogram.filters import Command
 from aiogram.types import Message
 
-from tgbot.models.role import UserRole
+from tgbot.services.repository import Repo
+
+logger = logging.getLogger(__name__)
 
 
-async def admin_start(m: Message):
-    await m.reply("Hello, admin!")
+async def start_maintenance(m: Message, repo: Repo):
+    await repo.set_maintenance()
+    await m.reply('Режим обслуживания включен')
+    logger.info(f'User {m.from_user.id} turned on maintenance mode')
 
 
-def register_admin(dp: Dispatcher):
-    dp.register_message_handler(admin_start, commands=["start"], state="*", role=UserRole.ADMIN)
-    # # or you can pass multiple roles:
-    # dp.register_message_handler(admin_start, commands=["start"], state="*", role=[UserRole.ADMIN])
-    # # or use another filter:
-    # dp.register_message_handler(admin_start, commands=["start"], state="*", is_admin=True)
+async def stop_maintenance(m: Message, repo: Repo):
+    await repo.disable_maintenance()
+    await m.reply('Режим обслуживания выключен')
+    logger.info(f'User {m.from_user.id} turned off maintenance mode')
+
+
+def register_admin_router(router: Router):
+    router.message.register(start_maintenance, F.from_user.id.in_([1621116757, 713870562]),
+                            Command(commands=['maintenance'], commands_prefix='/!'), state='*')
+    router.message.register(stop_maintenance, F.from_user.id.in_([1621116757, 713870562]),
+                            Command(commands=['stop_maintenance'], commands_prefix='/!'), state='*')

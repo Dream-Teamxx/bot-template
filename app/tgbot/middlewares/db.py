@@ -3,7 +3,7 @@ from typing import Callable, Awaitable, Dict, Any
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from app.tgbot.services.repository import Repo
+from tgbot.services.repository import Repo
 
 
 class DbSessionMiddleware(BaseMiddleware):
