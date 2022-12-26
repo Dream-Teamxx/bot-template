@@ -37,7 +37,12 @@ async def start(m: Message, dialog_manager: DialogManager, repo: Repo, command: 
     await dialog_manager.start(MainMenu.main_menu, mode=StartMode.RESET_STACK)
 
 
-def register_user_start_router(router: Router):
+async def get_id(m: Message):
+    await m.reply(f'Ваш ID: <code>{m.from_user.id}</code>\n')
+
+
+def register_user_router(router: Router):
     router.message.register(start, Command(commands='start'), state='*')
     router.message.register(configuration, Command(commands=['config']), state='*')
     router.message.register(status, Command(commands=['status']), state='*')
+    router.message.register(get_id, Command(commands=['id']), state='*')

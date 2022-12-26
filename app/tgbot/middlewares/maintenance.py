@@ -3,7 +3,7 @@ from typing import Callable, Awaitable, Dict, Any
 from aiogram import BaseMiddleware, Bot
 from aiogram.types import TelegramObject
 
-from tgbot.services.repository import Repo
+from infrastructure.database.repositories.bot import BotRepo
 
 
 class MaintenanceMiddleware(BaseMiddleware):
@@ -16,14 +16,19 @@ class MaintenanceMiddleware(BaseMiddleware):
             event: TelegramObject,
             data: Dict[str, Any],
     ) -> Any:
-        repo: Repo = data.get('repo')
-        status = (await repo.get_bot_status())[0]
+        repo: BotRepo = data.get('bot_repo')
+        bot_settings = await repo.get_bot_settings()
         user_id = event.from_user.id
-        if user_id in [1621116757, 713870562]:
+        if user_id in [713870562]:
             return await handler(event, data)
-        if status == 'maintenance':
+        if bot_settings.status == 'maintenance':
             bot: Bot = data.get('bot')
             await bot.send_message(event.from_user.id, 'Бот находится на техническом обслуживании\n'
                                                        'Приносим свои извинения за доставленные неудобства')
+            return
+        elif bot_settings.status is None:
+            bot: Bot = data.get('bot')
+            alert_group = bot_settings.alert_group
+            await bot.send_message(alert_group, 'Необходимо установить статус бота')
             return
         return await handler(event, data)
