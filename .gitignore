@@ -1,0 +1,5 @@
+venv/
+.idea/
+bot.ini
+/docker-compose.yml
+docker
