@@ -18,13 +18,13 @@ async def admin_start(m: Message, dialog_manager: DialogManager):
 
 async def start_maintenance(m: Message, repo: Repo):
     await repo.set_maintenance()
-    await m.reply('Режим обслуживания включен')
+    await m.reply('♻️ Режим обслуживания включен')
     logger.info(f'User {m.from_user.id} turned on maintenance mode')
 
 
 async def stop_maintenance(m: Message, repo: Repo):
     await repo.disable_maintenance()
-    await m.reply('Режим обслуживания выключен')
+    await m.reply('✅ Режим обслуживания выключен')
     logger.info(f'User {m.from_user.id} turned off maintenance mode')
 
 
@@ -33,17 +33,17 @@ async def add_admin(m: Message, command: CommandObject, admin_repo: AdminRepo):
     try:
         admin_id = int(new_admin)
     except TypeError:
-        await m.reply('Please specify admin id')
+        await m.reply('✏️ Пожалуйста, укажите Telegram ID администратора')
         return
     except ValueError:
-        await m.reply('Admin id must be integer')
+        await m.reply('❌ Telegram ID администратора должен быть числом!')
         return
     result = await admin_repo.add_admin(admin_id)
     if result:
         logger.info(f'User {m.from_user.id} added admin {admin_id}')
-        await m.reply(f'Пользователь {admin_id} добавлен в список админов')
+        await m.reply(f'✅ Пользователь {admin_id} добавлен в список админов')
     else:
-        await m.reply(f'Пользователь {admin_id} не найден')
+        await m.reply(f'❗ Пользователь {admin_id} не найден')
         logger.info(f'User {m.from_user.id} tried to add admin {admin_id}, but he is not found')
 
 
@@ -52,17 +52,17 @@ async def ban_user(m: Message, command: CommandObject, admin_repo: AdminRepo):
     try:
         user_id = int(user_id)
     except TypeError:
-        await m.reply('Please specify user id')
+        await m.reply('Пожалуйста, укажите Telegram ID пользователя')
         return
     except ValueError:
-        await m.reply('User id must be integer')
+        await m.reply('Telegram ID пользователя должен быть числом!')
         return
     result = await admin_repo.ban_user(user_id)
     if result:
         logger.info(f'User {m.from_user.id} banned {user_id}')
-        await m.reply(f'Пользователь {user_id} заблокирован')
+        await m.reply(f'🚫 Пользователь {user_id} заблокирован')
     else:
-        await m.reply(f'Пользователь {user_id} не найден')
+        await m.reply(f'❗ Пользователь {user_id} не найден')
         logger.info(f'User {m.from_user.id} tried to ban {user_id}, but he is not found')
 
 

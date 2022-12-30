@@ -5,6 +5,7 @@ from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 from aiogram_dialog import DialogManager, StartMode
 
+from configreader import config
 from tgbot.services.repository import Repo
 from tgbot.states.main_menu import MainMenu
 from tgbot.utils.system_config import getsysteminfo, get_process_uptime
@@ -23,7 +24,8 @@ async def configuration(m: Message):
 
 
 async def status(m: Message):
-    sysinfo = get_process_uptime()
+    service_name = config.service_name
+    sysinfo = get_process_uptime(service_name)
     await m.reply(f'<b>Current bot status:</b>\n'
                   f'<b>Status:</b> 🟢 Online\n'
                   f'<b>Uptime:</b> {sysinfo["uptime"]}\n'

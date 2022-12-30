@@ -27,8 +27,7 @@ def getsysteminfo():
         logger.exception(e)
 
 
-def get_process_uptime():
-    service = 'shop_bot'
+def get_process_uptime(service):
     p = subprocess.Popen(["systemctl", "status", service], stdout=subprocess.PIPE)
     (output, err) = p.communicate()
     output = output.decode('utf-8')
@@ -42,14 +41,9 @@ def get_process_uptime():
 
         if service_search:
             service_status['service'] = service_search.group(1)
-            # print("service:", service)
 
         elif status_search:
             service_status['status'] = status_search.group(1).strip()
-            # print("status:", status.strip())
             service_status['since'] = status_search.group(2).strip()
-            # print("since:", since.strip())
             service_status['uptime'] = status_search.group(3).strip()
-            # print("uptime:", uptime.strip())
-
     return service_status

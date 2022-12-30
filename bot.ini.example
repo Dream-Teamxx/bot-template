@@ -39,3 +39,5 @@ APP_PORT = 7001
 # You can skip this section if you want to use primary Bot API server
 # CUSTOM_BOT_API=http://localhost:8081
 ENVIRONMENT = DEV
+# Name of your systemd file
+SERVICE_NAME = tgbot
